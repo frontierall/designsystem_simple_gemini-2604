@@ -1,0 +1,34 @@
+name: Extract Design System
+
+on:
+  push:
+    paths:
+      - 'url.txt'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run extractor
+        run: npm run extract
+
+      - name: Commit and Push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Update design system data [skip ci]" || echo "No changes to commit"
+          git push

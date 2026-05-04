@@ -1,0 +1,13 @@
+{
+  "name": "design-system-extractor",
+  "version": "1.0.0",
+  "description": "Extracts design systems from URLs via GitHub Actions",
+  "main": "extractor.js",
+  "scripts": {
+    "extract": "node extractor.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.6.0",
+    "fs-extra": "^11.2.0"
+  }
+}

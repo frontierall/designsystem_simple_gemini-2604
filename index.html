@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System Extractor</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        h2 { border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        .color-swatch {
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            font-size: 12px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            border: 1px solid #ddd;
+        }
+        .screenshot-img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .font-item {
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            margin: 4px;
+            display: inline-block;
+        }
+        code {
+            display: block;
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Design System Viewer</h1>
+            <p id="site-info">분석 데이터를 불러오는 중...</p>
+        </header>
+
+        <div class="card">
+            <h2>📸 Screenshot</h2>
+            <img id="screenshot" class="screenshot-img" src="" alt="Site Screenshot">
+        </div>
+
+        <div class="card">
+            <h2>🌈 Colors</h2>
+            <div id="colors" class="grid"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔤 Fonts</h2>
+            <div id="fonts"></div>
+        </div>
+
+        <div class="card">
+            <h2>⚙️ CSS Variables (:root)</h2>
+            <code id="variables"></code>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const res = await fetch('./data/design-system.json');
+                const data = await res.json();
+
+                document.getElementById('site-info').innerText = `${data.title} (${data.url})`;
+                document.getElementById('screenshot').src = './data/screenshot.png';
+
+                // Render Colors
+                const colorContainer = document.getElementById('colors');
+                data.colors.forEach(color => {
+                    const swatch = document.createElement('div');
+                    swatch.className = 'color-swatch';
+                    swatch.style.backgroundColor = color;
+                    swatch.innerText = color;
+                    colorContainer.appendChild(swatch);
+                });
+
+                // Render Fonts
+                const fontContainer = document.getElementById('fonts');
+                data.fonts.forEach(font => {
+                    const span = document.createElement('span');
+                    span.className = 'font-item';
+                    span.innerText = font;
+                    fontContainer.appendChild(span);
+                });
+
+                // Render Variables
+                const varContainer = document.getElementById('variables');
+                varContainer.innerText = JSON.stringify(data.variables, null, 2);
+
+            } catch (err) {
+                document.getElementById('site-info').innerText = "데이터가 아직 없습니다. url.txt를 수정하고 GitHub Action이 완료될 때까지 기다려주세요.";
+            }
+        }
+        loadData();
+    </script>
+</body>
+</html>
