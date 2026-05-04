@@ -2,181 +2,110 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design System Extractor</title>
+    <title>Design System History Viewer</title>
     <style>
-        :root {
-            --primary: #3b82f6;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        header {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 24px;
-        }
-        h2 { border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 16px;
-        }
-        .color-swatch {
-            height: 100px;
-            border-radius: 8px;
-            display: flex;
-            align-items: flex-end;
-            padding: 8px;
-            font-size: 12px;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            border: 1px solid #ddd;
-        }
-        .screenshot-img {
-            max-width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        .font-item {
-            padding: 10px;
-            background: #f1f5f9;
-            border-radius: 6px;
-            margin: 4px;
-            display: inline-block;
-        }
-        code {
-            display: block;
-            background: #1e293b;
-            color: #f8fafc;
-            padding: 16px;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-        .btn-primary {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
-            text-decoration: none;
-            display: inline-block;
-            transition: transform 0.1s;
-        }
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
+        :root { --p: #3b82f6; --bg: #f8fafc; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; }
+        #sidebar { width: 300px; background: white; border-right: 1px solid #ddd; overflow-y: auto; padding: 20px; }
+        #content { flex: 1; overflow-y: auto; padding: 40px; }
+        .history-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; }
+        .history-item:hover { background: #eff6ff; }
+        .history-item.active { background: var(--p); color: white; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .swatch { height: 60px; border-radius: 4px; display: flex; align-items: flex-end; padding: 4px; font-size: 10px; color: white; text-shadow: 0 1px 1px black; border: 1px solid #eee; }
+        .btn-style { border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px; background: #fafafa; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        img { max-width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎨 Design System Viewer</h1>
-            <p id="site-info">분석 데이터를 불러오는 중...</p>
+    <div id="sidebar">
+        <h2>📜 History</h2>
+        <div id="history-list"></div>
+    </div>
+    <div id="content">
+        <div id="viewer-placeholder">기록을 선택해주세요.</div>
+        <div id="viewer" style="display:none;">
+            <h1 id="v-title"></h1>
+            <p id="v-url"></p>
             
-            <div style="margin-top: 20px;">
-                <button onclick="goToEditPage()" class="btn-primary">
-                    🚀 새 사이트 분석하기 (url.txt 수정)
-                </button>
-                <p style="font-size: 13px; margin-top: 10px; color: #64748b;">
-                    버튼을 누르면 GitHub의 <b>url.txt</b> 수정 페이지로 이동합니다.<br>
-                    주소 수정 후 하단의 <b>Commit changes</b> 버튼을 누르면 약 1~2분 뒤 분석 결과가 업데이트됩니다.
-                </p>
+            <div class="card">
+                <h2>📸 Screenshot</h2>
+                <img id="v-img" src="">
             </div>
-        </header>
 
-        <div class="card">
-            <h2>📸 Screenshot</h2>
-            <img id="screenshot" class="screenshot-img" src="" alt="Site Screenshot">
-        </div>
+            <div class="card">
+                <h2>🌈 Colors</h2>
+                <div id="v-colors" class="color-grid"></div>
+            </div>
 
-        <div class="card">
-            <h2>🌈 Colors</h2>
-            <div id="colors" class="grid"></div>
-        </div>
+            <div class="card">
+                <h2>🔘 Button Styles (Component Audit)</h2>
+                <div id="v-buttons"></div>
+            </div>
 
-        <div class="card">
-            <h2>🔤 Fonts</h2>
-            <div id="fonts"></div>
-        </div>
-
-        <div class="card">
-            <h2>⚙️ CSS Variables (:root)</h2>
-            <code id="variables"></code>
+            <div class="card">
+                <h2>📐 Layout Patterns</h2>
+                <div id="v-layout"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        function goToEditPage() {
-            // 현재 URL에서 GitHub 사용자명과 저장소명을 추측합니다.
-            const pathParts = window.location.pathname.split('/').filter(p => p);
-            const GITHUB_USER = window.location.hostname.split('.')[0];
-            // 저장소 이름을 수동으로 지정하거나 URL 구조에서 가져옵니다.
-            const GITHUB_REPO = pathParts[0] || 'designsystem-simple-gemini-2604';
-
-            const editUrl = `https://github.com/${GITHUB_USER}/${GITHUB_REPO}/edit/main/url.txt`;
-            window.open(editUrl, '_blank');
-        }
-
-        async function loadData() {
+        async function init() {
+            const listEl = document.getElementById('history-list');
             try {
-                const res = await fetch('./data/design-system.json');
-                const data = await res.json();
+                const res = await fetch('./data/history.json');
+                const history = await res.json();
 
-                document.getElementById('site-info').innerText = `${data.title} (${data.url})`;
-                document.getElementById('screenshot').src = './data/screenshot.png';
-
-                // Render Colors
-                const colorContainer = document.getElementById('colors');
-                colorContainer.innerHTML = '';
-                data.colors.forEach(color => {
-                    const swatch = document.createElement('div');
-                    swatch.className = 'color-swatch';
-                    swatch.style.backgroundColor = color;
-                    swatch.innerText = color;
-                    colorContainer.appendChild(swatch);
+                history.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `<strong>${item.title}</strong><br><small>${item.timestamp}</small>`;
+                    div.onclick = () => loadDetail(item, div);
+                    listEl.appendChild(div);
                 });
-
-                // Render Fonts
-                const fontContainer = document.getElementById('fonts');
-                fontContainer.innerHTML = '';
-                data.fonts.forEach(font => {
-                    const span = document.createElement('span');
-                    span.className = 'font-item';
-                    span.innerText = font;
-                    fontContainer.appendChild(span);
-                });
-
-                // Render Variables
-                const varContainer = document.getElementById('variables');
-                varContainer.innerText = JSON.stringify(data.variables, null, 2);
-
-            } catch (err) {
-                document.getElementById('site-info').innerText = "데이터가 아직 없습니다. url.txt를 수정하고 GitHub Action이 완료될 때까지 기다려주세요.";
+            } catch (e) {
+                listEl.innerHTML = "기록이 없습니다. url.txt를 수정하고 Action을 실행하세요.";
             }
         }
-        loadData();
+
+        async function loadDetail(item, el) {
+            document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            
+            const res = await fetch(`${item.path}result.json`);
+            const data = await res.json();
+
+            document.getElementById('viewer-placeholder').style.display = 'none';
+            document.getElementById('viewer').style.display = 'block';
+            
+            document.getElementById('v-title').innerText = data.title;
+            document.getElementById('v-url').innerText = data.url;
+            document.getElementById('v-img').src = `${item.path}screenshot.png`;
+
+            // Colors
+            const colors = document.getElementById('v-colors');
+            colors.innerHTML = data.colors.map(c => `<div class="swatch" style="background:${c}">${c}</div>`).join('');
+
+            // Buttons
+            const btns = document.getElementById('v-buttons');
+            btns.innerHTML = data.buttons.map(b => `
+                <div class="btn-style">
+                    <strong>"${b.text}" 버튼</strong><br>
+                    Padding: ${b.padding} | Radius: ${b.borderRadius} | Size: ${b.fontSize}
+                </div>
+            `).join('');
+
+            // Layout
+            const layout = document.getElementById('v-layout');
+            layout.innerHTML = `<table><tr><th>Tag</th><th>Class</th><th>Max-Width</th><th>Margin</th></tr>` + 
+                data.layout.map(l => `<tr><td>${l.tag}</td><td>${l.className}</td><td>${l.maxWidth}</td><td>${l.margin}</td></tr>`).join('') + `</table>`;
+        }
+
+        init();
     </script>
 </body>
 </html>

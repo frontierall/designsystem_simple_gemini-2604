@@ -2,135 +2,143 @@ const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 
-async function extractDesignSystem() {
-    let url;
-    // 1. Get URL from argument or url.txt
-    const argUrl = process.argv[2];
-    if (argUrl) {
-        url = argUrl.trim();
-    } else {
-        try {
-            url = await fs.readFile('url.txt', 'utf8');
-            url = url.trim();
-        } catch (err) {
-            console.error('Error reading url.txt:', err);
-        }
-    }
-
-    if (!url) {
-        console.error('No URL provided (via arg or url.txt)');
+async function run() {
+    // 1. Read multiple URLs from url.txt
+    let urls = [];
+    try {
+        const content = await fs.readFile('url.txt', 'utf8');
+        urls = content.split('\n').map(u => u.trim()).filter(u => u && u.startsWith('http'));
+    } catch (err) {
+        console.error('url.txt를 읽을 수 없습니다.');
         return;
     }
 
-    console.log(`Analyzing: ${url}`);
+    if (urls.length === 0) {
+        console.log('분석할 URL이 없습니다.');
+        return;
+    }
 
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    const page = await browser.newPage();
-    
-    // 2. Set realistic User-Agent and Viewport
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36');
-    await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 
-    try {
-        console.log(`Navigating to: ${url}`);
-        await page.goto(url, { waitUntil: 'networkidle0', timeout: 90000 });
+    const history = [];
 
-        // 3. Scroll to trigger lazy loading
-        await page.evaluate(async () => {
-            await new Promise((resolve) => {
-                let totalHeight = 0;
-                let distance = 100;
-                let timer = setInterval(() => {
-                    let scrollHeight = document.body.scrollHeight;
-                    window.scrollBy(0, distance);
-                    totalHeight += distance;
-                    if (totalHeight >= scrollHeight || totalHeight > 5000) {
-                        clearInterval(timer);
-                        resolve();
-                    }
-                }, 100);
-            });
-        });
+    for (const url of urls) {
+        console.log(`\n--- Analyzing: ${url} ---`);
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36');
+        await page.setViewport({ width: 1440, height: 900 });
 
-        // Ensure data directory exists
-        const dataDir = path.join(__dirname, 'data');
-        await fs.ensureDir(dataDir);
-
-        // 1. Take Screenshot
-        const screenshotPath = path.join(dataDir, 'screenshot.png');
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-        console.log('Screenshot saved.');
-
-        // 2. Extract Design Tokens
-        const designSystem = await page.evaluate(() => {
-            const tokens = {
-                colors: new Set(),
-                fonts: new Set(),
-                variables: {},
-                siteTitle: document.title
-            };
-
-            // Helper to get all computed styles
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach(el => {
-                const style = window.getComputedStyle(el);
-                
-                // Colors
-                if (style.color) tokens.colors.add(style.color);
-                if (style.backgroundColor && style.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                    tokens.colors.add(style.backgroundColor);
-                }
-
-                // Fonts
-                if (style.fontFamily) {
-                    const firstFont = style.fontFamily.split(',')[0].replace(/['"]/g, '').trim();
-                    tokens.fonts.add(firstFont);
-                }
-            });
-
-            // CSS Variables from :root
-            const rootStyle = window.getComputedStyle(document.documentElement);
-            const sheets = Array.from(document.styleSheets);
-            try {
-                sheets.forEach(sheet => {
-                    const rules = Array.from(sheet.cssRules || []);
-                    rules.forEach(rule => {
-                        if (rule.selectorText === ':root' || rule.selectorText === 'html') {
-                            const styles = rule.style;
-                            for (let i = 0; i < styles.length; i++) {
-                                const prop = styles[i];
-                                if (prop.startsWith('--')) {
-                                    tokens.variables[prop] = styles.getPropertyValue(prop).trim();
-                                }
-                            }
+        try {
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+            
+            // Scroll to trigger lazy loading
+            await page.evaluate(async () => {
+                await new Promise(r => {
+                    let totalHeight = 0;
+                    let distance = 200;
+                    let timer = setInterval(() => {
+                        window.scrollBy(0, distance);
+                        totalHeight += distance;
+                        if (totalHeight >= document.body.scrollHeight || totalHeight > 3000) {
+                            clearInterval(timer);
+                            window.scrollTo(0, 0);
+                            r();
                         }
-                    });
+                    }, 100);
                 });
-            } catch (e) {
-                console.warn('Could not access some stylesheets (CORS?)');
-            }
+            });
 
-            return {
-                title: tokens.siteTitle,
-                url: window.location.href,
-                colors: Array.from(tokens.colors).slice(0, 50), // Limit for brevity
-                fonts: Array.from(tokens.fonts),
-                variables: tokens.variables
-            };
-        });
+            // 2. Component Structure Audit Logic
+            const analysis = await page.evaluate(() => {
+                const getTokens = () => {
+                    const tokens = { colors: new Set(), fonts: new Set(), variables: {} };
+                    document.querySelectorAll('*').forEach(el => {
+                        const s = window.getComputedStyle(el);
+                        if (s.color) tokens.colors.add(s.color);
+                        if (s.backgroundColor && s.backgroundColor !== 'rgba(0, 0, 0, 0)') tokens.colors.add(s.backgroundColor);
+                        if (s.fontFamily) tokens.fonts.add(s.fontFamily.split(',')[0].replace(/['"]/g, '').trim());
+                    });
+                    return tokens;
+                };
 
-        // 3. Save JSON
-        const jsonPath = path.join(dataDir, 'design-system.json');
-        await fs.writeJson(jsonPath, designSystem, { spaces: 2 });
-        console.log('Design system data saved.');
+                const analyzeButtons = () => {
+                    const buttons = Array.from(document.querySelectorAll('button, a[class*="btn"], a[class*="button"]')).slice(0, 10);
+                    return buttons.map(b => {
+                        const s = window.getComputedStyle(b);
+                        return {
+                            text: b.innerText.substring(0, 10),
+                            padding: s.padding,
+                            borderRadius: s.borderRadius,
+                            backgroundColor: s.backgroundColor,
+                            fontSize: s.fontSize
+                        };
+                    });
+                };
 
-    } catch (err) {
-        console.error('Error during extraction:', err);
-    } finally {
-        await browser.close();
+                const analyzeLayout = () => {
+                    const mains = Array.from(document.querySelectorAll('main, section, .container, [class*="container"]')).slice(0, 5);
+                    return mains.map(m => {
+                        const s = window.getComputedStyle(m);
+                        return {
+                            tag: m.tagName,
+                            className: m.className.substring(0, 20),
+                            maxWidth: s.maxWidth,
+                            margin: s.margin
+                        };
+                    });
+                };
+
+                const tokens = getTokens();
+                return {
+                    title: document.title,
+                    url: window.location.href,
+                    colors: Array.from(tokens.colors).slice(0, 30),
+                    fonts: Array.from(tokens.fonts).slice(0, 10),
+                    buttons: analyzeButtons(),
+                    layout: analyzeLayout()
+                };
+            });
+
+            // 3. Save to Historical Archive
+            const domain = new URL(url).hostname.replace(/\./g, '_');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const folderName = `${timestamp}_${domain}`;
+            const folderPath = path.join(__dirname, 'data', folderName);
+            await fs.ensureDir(folderPath);
+
+            await page.screenshot({ path: path.join(folderPath, 'screenshot.png'), fullPage: false });
+            await fs.writeJson(path.join(folderPath, 'result.json'), analysis, { spaces: 2 });
+
+            history.push({
+                id: folderName,
+                timestamp,
+                title: analysis.title,
+                url,
+                path: `./data/${folderName}/`
+            });
+
+            console.log(`Saved to ${folderName}`);
+
+        } catch (err) {
+            console.error(`Error analyzing ${url}:`, err.message);
+        } finally {
+            await page.close();
+        }
     }
+
+    // Update history.json index
+    const historyPath = path.join(__dirname, 'data', 'history.json');
+    let existingHistory = [];
+    if (await fs.pathExists(historyPath)) {
+        existingHistory = await fs.readJson(historyPath);
+    }
+    const updatedHistory = [...history, ...existingHistory].slice(0, 50); // Keep last 50
+    await fs.writeJson(historyPath, updatedHistory, { spaces: 2 });
+
+    await browser.close();
+    console.log('\n--- All analysis completed ---');
 }
 
-extractDesignSystem();
+run();
