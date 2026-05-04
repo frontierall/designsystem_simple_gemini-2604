@@ -70,6 +70,23 @@
             border-radius: 8px;
             overflow-x: auto;
         }
+        .btn-primary {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -77,6 +94,16 @@
         <header>
             <h1>🎨 Design System Viewer</h1>
             <p id="site-info">분석 데이터를 불러오는 중...</p>
+            
+            <div style="margin-top: 20px;">
+                <button onclick="goToEditPage()" class="btn-primary">
+                    🚀 새 사이트 분석하기 (url.txt 수정)
+                </button>
+                <p style="font-size: 13px; margin-top: 10px; color: #64748b;">
+                    버튼을 누르면 GitHub의 <b>url.txt</b> 수정 페이지로 이동합니다.<br>
+                    주소 수정 후 하단의 <b>Commit changes</b> 버튼을 누르면 약 1~2분 뒤 분석 결과가 업데이트됩니다.
+                </p>
+            </div>
         </header>
 
         <div class="card">
@@ -101,6 +128,17 @@
     </div>
 
     <script>
+        function goToEditPage() {
+            // 현재 URL에서 GitHub 사용자명과 저장소명을 추측합니다.
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            const GITHUB_USER = window.location.hostname.split('.')[0];
+            // 저장소 이름을 수동으로 지정하거나 URL 구조에서 가져옵니다.
+            const GITHUB_REPO = pathParts[0] || 'designsystem-simple-gemini-2604';
+
+            const editUrl = `https://github.com/${GITHUB_USER}/${GITHUB_REPO}/edit/main/url.txt`;
+            window.open(editUrl, '_blank');
+        }
+
         async function loadData() {
             try {
                 const res = await fetch('./data/design-system.json');
@@ -111,6 +149,7 @@
 
                 // Render Colors
                 const colorContainer = document.getElementById('colors');
+                colorContainer.innerHTML = '';
                 data.colors.forEach(color => {
                     const swatch = document.createElement('div');
                     swatch.className = 'color-swatch';
@@ -121,6 +160,7 @@
 
                 // Render Fonts
                 const fontContainer = document.getElementById('fonts');
+                fontContainer.innerHTML = '';
                 data.fonts.forEach(font => {
                     const span = document.createElement('span');
                     span.className = 'font-item';

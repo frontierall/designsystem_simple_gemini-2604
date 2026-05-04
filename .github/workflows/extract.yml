@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'url.txt'
-  workflow_dispatch: # Allows manual trigger
+  workflow_dispatch:
 
 jobs:
   extract:
@@ -23,7 +23,9 @@ jobs:
         run: npm install
 
       - name: Run extractor
-        run: npm run extract
+        run: |
+          URL=$(cat url.txt | xargs)
+          npm run extract -- "$URL"
 
       - name: Commit and Push results
         run: |

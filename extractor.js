@@ -4,12 +4,21 @@ const path = require('path');
 
 async function extractDesignSystem() {
     let url;
-    try {
-        url = await fs.readFile('url.txt', 'utf8');
-        url = url.trim();
-        if (!url) throw new Error('URL is empty');
-    } catch (err) {
-        console.error('Error reading url.txt:', err);
+    // 1. Get URL from argument or url.txt
+    const argUrl = process.argv[2];
+    if (argUrl) {
+        url = argUrl.trim();
+    } else {
+        try {
+            url = await fs.readFile('url.txt', 'utf8');
+            url = url.trim();
+        } catch (err) {
+            console.error('Error reading url.txt:', err);
+        }
+    }
+
+    if (!url) {
+        console.error('No URL provided (via arg or url.txt)');
         return;
     }
 
