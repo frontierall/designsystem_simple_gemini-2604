@@ -1,0 +1,73 @@
+{
+  "title": "Gabriel Valdivia",
+  "url": "https://www.gabrielvaldivia.com/",
+  "colors": [
+    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
+    "rgba(240, 240, 240, 0.6)",
+    "rgba(0, 0, 0, 0.03)",
+    "rgba(0, 0, 0, 0)",
+    "rgba(0, 0, 0, 0.6)",
+    "rgba(0, 0, 0, 0.2)",
+    "oklab(0 0 0 / 0.02)"
+  ],
+  "fonts": [
+    "Inter",
+    "Inter Display"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "padding": "0px",
+      "borderRadius": "3.35544e+07px",
+      "backgroundColor": "rgba(240, 240, 240, 0.6)",
+      "fontSize": "20px"
+    },
+    {
+      "text": "",
+      "padding": "0px",
+      "borderRadius": "3.35544e+07px",
+      "backgroundColor": "rgba(240, 240, 240, 0.6)",
+      "fontSize": "20px"
+    },
+    {
+      "text": "",
+      "padding": "0px",
+      "borderRadius": "3.35544e+07px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "20px"
+    }
+  ],
+  "layout": [
+    {
+      "tag": "SECTION",
+      "className": "px-5 tablet:px-10 pt",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "MAIN",
+      "className": "page-transition",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "scroll-mt-0 pt-0 tab",
+      "maxWidth": "none",
+      "margin": "0px 0px -80px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "",
+      "maxWidth": "none",
+      "margin": "0px"
+    }
+  ]
+}

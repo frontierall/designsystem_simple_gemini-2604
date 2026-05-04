@@ -1,0 +1,143 @@
+{
+  "title": "Stripe | Financial Infrastructure to Grow Your Revenue",
+  "url": "https://stripe.com/",
+  "colors": [
+    "rgb(0, 0, 0)",
+    "rgb(83, 58, 253)",
+    "rgb(6, 27, 49)",
+    "rgba(255, 255, 255, 0.8)",
+    "rgb(255, 255, 255)",
+    "rgba(255, 255, 255, 0)",
+    "rgb(232, 233, 255)",
+    "rgb(100, 116, 141)",
+    "rgb(129, 184, 26)",
+    "rgba(0, 14, 255, 0.5)",
+    "rgb(45, 37, 100)",
+    "rgba(255, 255, 255, 0.65)",
+    "rgb(229, 237, 245)",
+    "rgb(26, 44, 68)",
+    "rgb(39, 57, 81)",
+    "rgb(80, 97, 122)",
+    "rgb(255, 97, 24)",
+    "rgb(255, 224, 209)",
+    "rgba(248, 250, 253, 0.45)",
+    "rgba(255, 255, 255, 0.38)",
+    "rgb(0, 214, 111)",
+    "rgb(60, 79, 105)",
+    "rgb(248, 250, 253)",
+    "rgb(127, 125, 252)",
+    "rgb(236, 240, 244)",
+    "rgba(40, 99, 177, 0.1)",
+    "rgb(40, 99, 177)",
+    "rgb(255, 229, 218)",
+    "rgba(255, 229, 218, 0.1)",
+    "rgb(102, 118, 145)"
+  ],
+  "fonts": [
+    "sohne-var"
+  ],
+  "buttons": [
+    {
+      "text": "Products",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Solutions",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Developers",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Resources",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Pricing",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Sign in",
+      "padding": "12px 0px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "14px"
+    },
+    {
+      "text": "Start now",
+      "padding": "15.5px 24px 16.5px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgb(83, 58, 253)",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Contact sa",
+      "padding": "14.5px 24px 15.5px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(255, 255, 255, 0)",
+      "fontSize": "16px"
+    },
+    {
+      "text": "Back",
+      "padding": "15.5px 24px 16.5px",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "fontSize": "16px"
+    },
+    {
+      "text": "",
+      "padding": "0px",
+      "borderRadius": "6px",
+      "backgroundColor": "rgb(232, 233, 255)",
+      "fontSize": "16px"
+    }
+  ],
+  "layout": [
+    {
+      "tag": "DIV",
+      "className": "section-container na",
+      "maxWidth": "1298px",
+      "margin": "0px 71px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "navigation-menu-foot",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "navigation-menu-head",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "MAIN",
+      "className": "",
+      "maxWidth": "none",
+      "margin": "0px"
+    },
+    {
+      "tag": "SECTION",
+      "className": "hds-color-mode hero-",
+      "maxWidth": "none",
+      "margin": "0px"
+    }
+  ]
+}
