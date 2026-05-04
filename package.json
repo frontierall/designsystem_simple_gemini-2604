@@ -1,13 +1,24 @@
 {
-  "name": "design-system-extractor",
+  "name": "design-system-extractor-vercel",
   "version": "1.0.0",
-  "description": "Extracts design systems from URLs via GitHub Actions",
-  "main": "extractor.js",
+  "private": true,
   "scripts": {
-    "extract": "node extractor.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "puppeteer": "^22.6.0",
-    "fs-extra": "^11.2.0"
+    "@sparticuz/chromium": "^123.0.0",
+    "next": "14.2.3",
+    "puppeteer-core": "^22.6.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
   }
 }
