@@ -25,13 +25,34 @@ async function extractDesignSystem() {
     console.log(`Analyzing: ${url}`);
 
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
     });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 800 });
+    
+    // 2. Set realistic User-Agent and Viewport
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36');
+    await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 
     try {
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        console.log(`Navigating to: ${url}`);
+        await page.goto(url, { waitUntil: 'networkidle0', timeout: 90000 });
+
+        // 3. Scroll to trigger lazy loading
+        await page.evaluate(async () => {
+            await new Promise((resolve) => {
+                let totalHeight = 0;
+                let distance = 100;
+                let timer = setInterval(() => {
+                    let scrollHeight = document.body.scrollHeight;
+                    window.scrollBy(0, distance);
+                    totalHeight += distance;
+                    if (totalHeight >= scrollHeight || totalHeight > 5000) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, 100);
+            });
+        });
 
         // Ensure data directory exists
         const dataDir = path.join(__dirname, 'data');
